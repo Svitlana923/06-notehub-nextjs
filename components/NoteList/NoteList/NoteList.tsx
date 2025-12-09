@@ -1,6 +1,6 @@
 
 import Note from "@/lib/types.note";
-import NoteItem from "@/components/Header/NoteItem/NoteItem/NoteItem";
+import NoteItem from "@/components/NoteItem/NoteItem";
 
 type Props = {
   notes: Note[];
