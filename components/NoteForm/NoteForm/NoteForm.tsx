@@ -4,7 +4,7 @@ import { Formik, Form, Field, ErrorMessage as FormikError } from "formik";
 import { useId } from "react";
 import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createNote } from "../../services/noteService"; 
+import { createNote } from "@/lib/api"; 
 import { toast } from "react-hot-toast";
 
 interface NoteFormProps {
