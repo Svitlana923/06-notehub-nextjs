@@ -1,5 +1,5 @@
 
-import Note from "@/lib/types.note";
+import Note from "@/types/note";
 import NoteItem from "@/components/NoteItem/NoteItem";
 
 type Props = {
