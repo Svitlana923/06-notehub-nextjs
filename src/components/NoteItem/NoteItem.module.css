@@ -25,16 +25,37 @@
 }
 
 .actions {
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    /* ліворуч - деталі, праворуч - видалити */
+    align-items: center;
+}
+
+.detailsButton {
+    background-color: #3182ce;
+    /* синя */
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.detailsButton:hover {
+    background-color: #2b6cb0;
 }
 
 .deleteButton {
     background-color: #f56565;
+    /* червона */
     color: white;
     border: none;
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 .deleteButton:hover {
