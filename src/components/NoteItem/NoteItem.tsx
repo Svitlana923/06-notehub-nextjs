@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import  Note from '@/types/note';
+import  Note from '@/src/types/note';
 
 type Props = {
   item: Note;
