@@ -1,54 +1,83 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchNotes, deleteNote } from '@/src/lib/api';
-import Link from 'next/link';
+import { fetchNotes, deleteNote } from '@/lib/api';
+
 import css from './Notes.client.module.css';
+
+import NoteList from '@/components/NoteList/NoteList';
+import SearchBox from '@/components/SearchBox/SearchBox';
+import Pagination from '@/components/Pagination/Pagination';
+import Modal from '@/components/Modal/Modal';
+import NoteForm from '@/components/NoteForm/NoteForm';
+
+import { Note } from '@/types/note';
 
 export default function NotesClient() {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const queryClient = useQueryClient();
 
-  const { data: notes, isLoading, error } = useQuery({
-    queryKey: ["notes", search],
-    queryFn: () => fetchNotes(search),
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Fetch notes
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['notes', debouncedSearch, currentPage],
+    queryFn: () => fetchNotes(debouncedSearch, currentPage),
+    keepPreviousData: true,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (error) return <p>Could not fetch the list of notes. {(error as Error).message}</p>;
+  const notes: Note[] = data?.notes ?? [];
+  const totalPages: number = data?.totalPages ?? 0;
+
+  // Delete note
+  const handleDelete = async (id: string) => {
+    await deleteNote(id);
+    queryClient.invalidateQueries({ queryKey: ['notes'] });
+  };
 
   return (
     <div className={css.container}>
       <div className={css.controls}>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search..."
-        />
+        <SearchBox onChange={setSearch} />
+
+        <button type="button" onClick={() => setIsModalOpen(true)}>
+          Create note
+        </button>
       </div>
 
-      <ul className={css.list}>
-        {notes?.map((note) => (
-          <li key={note.id} className={css.item}>
-            <h3>{note.title}</h3>
-            <p>{note.content}</p>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Could not fetch notes: {(error as Error).message}</p>}
 
-            <div className={css.actions}>
-              <Link href={`/notes/${note.id}`}>View details</Link>
+      {!isLoading && !error && (
+        <NoteList notes={notes} onDelete={handleDelete} />
+      )}
 
-              <button
-                onClick={async () => {
-                  await deleteNote(note.id);
-                  queryClient.invalidateQueries({ queryKey: ["notes"] });
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
+
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <NoteForm onCancel={() => setIsModalOpen(false)} />
+        </Modal>
+      )}
     </div>
   );
 }
