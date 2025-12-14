@@ -8,6 +8,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNote } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 
+import type { NoteTag } from '@/types/note';
+
 interface NoteFormProps {
   onCancel: () => void;
 }
@@ -15,7 +17,7 @@ interface NoteFormProps {
 interface NoteFormValues {
   title: string;
   content: string;
-  tag: string;
+  tag: NoteTag;
 }
 
 const initialValues: NoteFormValues = {
@@ -29,9 +31,11 @@ const NoteFormSchema = Yup.object({
     .min(3, 'Title must be at least 3 characters')
     .max(50, 'Title is too long')
     .required('Title is required'),
+
   content: Yup.string()
     .max(500, 'Content must be no longer than 500 characters'),
-  tag: Yup.string()
+
+  tag: Yup.mixed<NoteTag>()
     .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'])
     .required('Tag is required'),
 });
@@ -72,11 +76,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
                 type="text"
                 className={css.input}
               />
-              <FormikError
-                name="title"
-                component="span"
-                className={css.error}
-              />
+              <FormikError name="title" component="span" className={css.error} />
             </div>
 
             <div className={css.formGroup}>
@@ -88,11 +88,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
                 rows={8}
                 className={css.textarea}
               />
-              <FormikError
-                name="content"
-                component="span"
-                className={css.error}
-              />
+              <FormikError name="content" component="span" className={css.error} />
             </div>
 
             <div className={css.formGroup}>
@@ -109,11 +105,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
                 <option value="Meeting">Meeting</option>
                 <option value="Shopping">Shopping</option>
               </Field>
-              <FormikError
-                name="tag"
-                component="span"
-                className={css.error}
-              />
+              <FormikError name="tag" component="span" className={css.error} />
             </div>
 
             <div className={css.actions}>
