@@ -35,12 +35,22 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
   return data;
 };
 
-export const createNote = async (
-  payload: Pick<Note, "title" | "content" | "tag">
-): Promise<Note> => {
-  const { data } = await api.post<Note>("/notes", payload);
+export const createNote = async (payload: {
+  title: string;
+  content: string;
+  tag: string;
+}): Promise<Note> => {
+  const { title, content, tag } = payload;
+
+  const { data } = await api.post<Note>("/notes", {
+    title,
+    content,
+    categoryId: tag, 
+  });
+
   return data;
 };
+
 
 export const deleteNote = async (id: string): Promise<Note> => {
   const { data } = await api.delete<Note>(`/notes/${id}`);
