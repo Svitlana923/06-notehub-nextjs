@@ -40,17 +40,9 @@ export const createNote = async (payload: {
   content: string;
   tag: string;
 }): Promise<Note> => {
-  const { title, content, tag } = payload;
-
-  const { data } = await api.post<Note>("/notes", {
-    title,
-    content,
-    categoryId: tag, 
-  });
-
+  const { data } = await api.post<Note>("/notes", payload);
   return data;
 };
-
 
 export const deleteNote = async (id: string): Promise<Note> => {
   const { data } = await api.delete<Note>(`/notes/${id}`);
